@@ -1,7 +1,7 @@
 # ===============================================================================================
 #   Melody's Escape 2 (ME2) - SpeedAdjustedSongTrackConverter
 # -----------------------------------------------------------------------------------------------
-#   Version: 1.0 (2024-08-09)
+#   Version: 1.0.1 (2024-08-09)
 #   Targeted game version: 1.13 (Early Access)
 #
 #   (Might not be compatible with later versions of the game if the way tracks are stored gets changed)

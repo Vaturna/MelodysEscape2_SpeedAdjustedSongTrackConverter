@@ -1,13 +1,13 @@
 ===============================================================================================
   Melody's Escape 2 (ME2) - SpeedAdjustedSongTrackConverter
 -----------------------------------------------------------------------------------------------
-  Version: 1.0 (2024-08-09)
+  Version: 1.0.1 (2024-08-09)
   Targeted game version: 1.13 (Early Access)
 
   (Might not be compatible with later versions of the game if the way tracks are stored gets changed)
 ===============================================================================================
 
-This is a utility script for the rythm game "Melody's Escape 2" by Icetecy.
+This is a utility script for the rythm game "Melody's Escape 2" by Icetesy.
 
 The goal of this script is to create tracks for Melody's Escape 2 with higher BPM (beats per minute) than what is natively supported by the game by generating a track for a slowed-down version of a song and converting it back to the original speed.
 
