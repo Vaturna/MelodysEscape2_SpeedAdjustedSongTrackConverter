@@ -1,7 +1,7 @@
 ===============================================================================================
   Melody's Escape 2 (ME2) - SpeedAdjustedSongTrackConverter
 -----------------------------------------------------------------------------------------------
-  Version: 1.0.1 (2024-08-09)
+  Version: 1.0.2 (2024-08-09)
   Targeted game version: 1.13 (Early Access)
 
   (Might not be compatible with later versions of the game if the way tracks are stored gets changed)
@@ -15,7 +15,7 @@ The goal of this script is to create tracks for Melody's Escape 2 with higher BP
 
 GENERAL INFORMATION:
 
-If "Cache track data" is enabled in the settings the game will store files with information about the tracks inside the user's "AppData\LocalLow\Icetecy\Melodys Escape 2" directory. If a file for the song already exists, the game will try to load the track from that file instead of generating a new track.
+If "Cache track data" is enabled in the settings the game will store files with information about the tracks inside the user's "AppData\LocalLow\Icetesy\Melodys Escape 2" directory. If a file for the song already exists, the game will try to load the track from that file instead of generating a new track.
 The goal is to replace the file for a given song to make the game load a different track for that song.
 
 
