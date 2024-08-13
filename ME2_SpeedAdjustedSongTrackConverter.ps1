@@ -1,7 +1,7 @@
 # ===============================================================================================
 #   Melody's Escape 2 (ME2) - SpeedAdjustedSongTrackConverter
 # -----------------------------------------------------------------------------------------------
-#   Version: 1.0.2 (2024-08-09)
+#   Version: 1.1.0 (2024-08-13)
 #   Targeted game version: 1.13 (Early Access)
 #
 #   (Might not be compatible with later versions of the game if the way tracks are stored gets changed)
@@ -106,8 +106,8 @@ $ErrorActionPreference = "Stop"
 
 if ($PSCmdlet.ParameterSetName -eq "LiteralPath")
 {
-	$fileA = Get-Item "$OriginalTrackFilePath"
-	$fileB = Get-Item "$AdjustedTrackFilePath"
+	$fileA = Get-Item -LiteralPath "$OriginalTrackFilePath"
+	$fileB = Get-Item -LiteralPath "$AdjustedTrackFilePath"
 	$fileOut = $OutputPath
 }
 else
@@ -162,35 +162,34 @@ else
 
 
 
-$aContent = Get-Content $fileA -Head 3
-$bContent = Get-Content $fileB
+$rawContentA = Get-Content -LiteralPath $fileA
+$rawContentB = Get-Content -LiteralPath $fileB
 
-$versionA = $aContent[0]
-$versionB = $bContent[0]
-$metadataA = $aContent[1] -split ";"
-$metadataB = $bContent[1] -split ";"
+$versionA = $rawContentA[0]
+$versionB = $rawContentB[0]
+$metadataA = $rawContentA[1] -split ";"
+$metadataB = $rawContentB[1] -split ";"
 
 $speedChange = $metadataA[0] / $metadataB[0]
 
-if ([float]$versionA -ge [float]$versionB)
-{
-	$trackVersion = $versionA
-}
-else
-{
-	$trackVersion = $versionB
-}
+$transitionsA = $rawContentA[2] -split ";"
+$transitionsB = $rawContentB[2] -split ";"
+$obstaclesA = $rawContentA[3] -split ";"
+$obstaclesB = $rawContentB[3] -split ";"
+
+
+$trackVersion = [Math]::Max([float]$versionA, [float]$versionB)
 
 $trackMetadata = $metadataA[0], $metadataA[1], [int]([int]$metadataB[2] / $speedChange), $metadataA[3]
 
 if (-not $OVERWRITE_TRANSITIONS)
 {
-	$trackTransitions = $aContent[2] -split ";"
+	$trackTransitions = $transitionsA
 }
 else
 {
 	$trackTransitions = New-Object Collections.ArrayList
-	foreach ($c in ($bContent[2] -split ";"))
+	foreach ($c in $transitionsB)
 	{
 		if ($c -match "^(\w):(\d+)-(\d+)(.*)")
 		{
@@ -203,8 +202,8 @@ else
 	}
 }
 
-$trackData = New-Object Collections.ArrayList
-foreach ($c in ($bContent[3] -split ";"))
+$trackObstacles = New-Object Collections.ArrayList
+foreach ($c in $obstaclesB)
 {
 	if ($c -match "^(\d+)\:([SZ])-?(\d*)$")
 	{
@@ -217,15 +216,15 @@ foreach ($c in ($bContent[3] -split ";"))
 				$hold = "-" + [int]$holdTime
 			}
 		}
-		$trackData.Add( ([int]([int]$Matches[1] * $speedChange)).toString() + ":" + $Matches[2] + $hold ) | Out-Null
+		$trackObstacles.Add( ([int]([int]$Matches[1] * $speedChange)).toString() + ":" + $Matches[2] + $hold ) | Out-Null
 	}
 	else
 	{
-		$trackData.Add($c) | Out-Null
+		$trackObstacles.Add($c) | Out-Null
 	}
 }
 
-$output = $trackVersion, ($trackMetadata -join ";"), ($trackTransitions -join ";"), ($trackData -join ";")
+$output = $trackVersion, ($trackMetadata -join ";"), ($trackTransitions -join ";"), ($trackObstacles -join ";")
 
 
 
@@ -235,6 +234,8 @@ $output = $trackVersion, ($trackMetadata -join ";"), ($trackTransitions -join ";
 "???: $($metadataA[1])" | Out-Host
 "BPM: $($metadataA[2])" | Out-Host
 "Time Signature (4/4 or 3/4): $($metadataA[3])" | Out-Host
+"Transition Count: $($transitionsA.Count - 1)" | Out-Host
+"Raw Obstacle Count: $($obstaclesA.Count - 1)" | Out-Host
 "" | Out-Host
 "* Alternative track '$($fileB.Name)'" | Out-Host
 "Version: $versionB" | Out-Host
@@ -242,6 +243,10 @@ $output = $trackVersion, ($trackMetadata -join ";"), ($trackTransitions -join ";
 "???: $($metadataB[1])" | Out-Host
 "BPM: $($metadataB[2])" | Out-Host
 "Time Signature (4/4 or 3/4): $($metadataB[3])" | Out-Host
+"Transition Count: $($transitionsB.Count - 1)" | Out-Host
+"Raw Obstacle Count: $($obstaclesB.Count - 1)" | Out-Host
+"" | Out-Host
+"(Time Adjustment: $($speedChange.ToString("p")))" | Out-Host
 "" | Out-Host
 "- New data -" | Out-Host
 "Version: $trackVersion" | Out-Host
@@ -249,6 +254,8 @@ $output = $trackVersion, ($trackMetadata -join ";"), ($trackTransitions -join ";
 "???: $($trackMetadata[1])" | Out-Host
 "BPM: $($trackMetadata[2])" | Out-Host
 "Time Signature (4/4 or 3/4): $($trackMetadata[3])" | Out-Host
+"Transition Count: $($trackTransitions.Count - 1)" | Out-Host
+"Raw Obstacle Count: $($trackObstacles.Count - 1)" | Out-Host
 "" | Out-Host
 
 if ($versionA -ne $versionB)
@@ -270,7 +277,7 @@ if ($PSCmdlet.ParameterSetName -ne "LiteralPath")
 
 $output | Out-Host
 
-Set-Content $fileOut $output
+Set-Content -LiteralPath $fileOut $output
 
 "" | Out-Host
 "Conversion Successful!" | Out-Host

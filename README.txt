@@ -1,13 +1,13 @@
 ===============================================================================================
   Melody's Escape 2 (ME2) - SpeedAdjustedSongTrackConverter
 -----------------------------------------------------------------------------------------------
-  Version: 1.0.2 (2024-08-09)
+  Version: 1.1.0 (2024-08-09)
   Targeted game version: 1.13 (Early Access)
 
   (Might not be compatible with later versions of the game if the way tracks are stored gets changed)
 ===============================================================================================
 
-This is a utility script for the rythm game "Melody's Escape 2" by Icetesy.
+This is a utility script for the rhythm game "Melody's Escape 2" by Icetesy.
 
 The goal of this script is to create tracks for Melody's Escape 2 with higher BPM (beats per minute) than what is natively supported by the game by generating a track for a slowed-down version of a song and converting it back to the original speed.
 
@@ -41,12 +41,12 @@ It can be problematic if you use different songs that have the exact same filena
 
 USAGE:
 
-To use the script, you need a song you want to play in ME2 as well as a slowed-down version of the song. Open both songs inside the game using the desired object density level with "Cache track data" enabled to generate the tracks. The script will use both tracks to map the obstacles from the speed-adjusted version into the track of the original song.
+To use the script, you need a song you want to play in ME2 as well as a slowed-down version of the song. Open both songs inside the game using the desired difficulty with "Cache track data" enabled to generate the tracks. The script will use both tracks to map the obstacles from the speed-adjusted version into the track of the original song.
 
 By default the script will ask about the names of the songs that will be used for the conversion and will automatically overwrite the track data of the original song.
-The script keeps the intensity levels and transitions from the original track and converts all slides that are considered too short into regular notes. This behavior can be adjusted by using -OVERWRITE_TRANSITIONS and -MINIMUM_HOLD_DURATION <number> (if hold duration is 0 the script will not change any slides. The default is 17 hundreds of a second).
+The script keeps the intensity levels and transitions from the original track and converts all slides that are considered too short into regular notes. This behavior can be adjusted by using -OVERWRITE_TRANSITIONS and -MINIMUM_HOLD_DURATION <number> (if minimum hold duration is 0 the script will not change any slides. The default is 17 hundreds of a second).
 
-To get good results, the alternative version of the song should be slowed down at least enough so that its tempo falls below the next-lowest BPM threshold (for "Extreme" object density it should fall below 220 or 110). Being only slightly below the BPM threshold can lead to fewer obstacles being generated. Slowing down a song by more than 50% may give unpredictable results.
+To get good results, the alternative version of the song should be slowed down at least enough so that its tempo falls below the next-lowest BPM threshold (for "Extreme" obstacle density it should fall below 220 or 110). Being only slightly below the BPM threshold can lead to fewer obstacles being generated, this can be used on purpose to generate a track that has higher BPM only for some passages. Slowing down a song by more than 50% may give unpredictable results.
 
 
 You can either execute the script "ME2_SpeedAdjustedSongTrackConverter.ps1" directly or use the "ME2_SpeedAdjustedSongTrackConverter.bat" file.
