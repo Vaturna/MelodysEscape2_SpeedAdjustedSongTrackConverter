@@ -1,7 +1,7 @@
 ===============================================================================================
   Melody's Escape 2 (ME2) - SpeedAdjustedSongTrackConverter
 -----------------------------------------------------------------------------------------------
-  Version: 1.1.1 (2024-08-13)
+  Version: 1.2.0 (2024-08-27)
   Targeted game version: 1.13 (Early Access)
 
   (Might not be compatible with later versions of the game if the way tracks are stored gets changed)
@@ -44,7 +44,7 @@ USAGE:
 To use the script, you need a song you want to play in ME2 as well as a slowed-down version of the song. Open both songs inside the game using the desired difficulty with "Cache track data" enabled to generate the tracks. The script will use both tracks to map the obstacles from the speed-adjusted version into the track of the original song.
 
 By default the script will ask about the names of the songs that will be used for the conversion and will automatically overwrite the track data of the original song.
-The script keeps the intensity levels and transitions from the original track and converts all slides that are considered too short into regular notes. This behavior can be adjusted by using -OVERWRITE_TRANSITIONS and -MINIMUM_HOLD_DURATION <number> (if minimum hold duration is 0 the script will not change any slides. The default is 17 hundreds of a second).
+The script keeps the intensity levels and transitions from the original track, shortens slides that would block too much vision on the next obstacle and converts all slides that are considered too short into regular notes. This behavior can be adjusted by using -OVERWRITE_TRANSITIONS, -MINIMUM_HOLD_DURATION <number> and -MINIMUM_HOLD_GAP <number> (if minimum hold duration or hold gap is 0 the script will not change any slides. The default duration is 16, the default gap is 9 hundreds of a second).
 
 To get good results, the alternative version of the song should be slowed down at least enough so that its tempo falls below the next-lowest BPM threshold (for "Extreme" obstacle density it should fall below 220 or 110). Being only slightly below the BPM threshold can lead to fewer obstacles being generated, this can be used on purpose to generate a track that has higher BPM only for some passages. Slowing down a song by more than 50% may give unpredictable results.
 

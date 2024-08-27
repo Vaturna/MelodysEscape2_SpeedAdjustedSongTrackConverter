@@ -1,7 +1,7 @@
 # ===============================================================================================
 #   Melody's Escape 2 (ME2) - SpeedAdjustedSongTrackConverter
 # -----------------------------------------------------------------------------------------------
-#   Version: 1.1.0 (2024-08-13)
+#   Version: 1.2.0 (2024-08-27)
 #   Targeted game version: 1.13 (Early Access)
 #
 #   (Might not be compatible with later versions of the game if the way tracks are stored gets changed)
@@ -38,7 +38,9 @@ param
 	[Parameter(ParameterSetName = 'SeparateNames')]
 	$ME2_TRACK_CACHE_DIRECTORY = "$($env:AppData)\..\LocalLow\Icetesy\Melody's Escape 2\Tracks Cache",
 	[int]
-	$MINIMUM_HOLD_DURATION = 17,
+	$MINIMUM_HOLD_DURATION = 16,
+	[int]
+	$MINIMUM_HOLD_GAP = 9,
 	[switch]
 	$OVERWRITE_TRANSITIONS
 )
@@ -172,59 +174,81 @@ $metadataB = $rawContentB[1] -split ";"
 
 $speedChange = $metadataA[0] / $metadataB[0]
 
-$transitionsA = $rawContentA[2] -split ";"
-$transitionsB = $rawContentB[2] -split ";"
+$sectionsA = $rawContentA[2] -split ";"
+$sectionsB = $rawContentB[2] -split ";"
 $obstaclesA = $rawContentA[3] -split ";"
 $obstaclesB = $rawContentB[3] -split ";"
 
 
-$trackVersion = [Math]::Max([float]$versionA, [float]$versionB)
+if ([float]$versionA -ge [float]$versionB)
+{
+	$trackVersion = $versionA
+}
+else
+{
+	$trackVersion = $versionB
+}
 
 $trackMetadata = $metadataA[0], $metadataA[1], [int]([int]$metadataB[2] / $speedChange), $metadataA[3]
 
 if (-not $OVERWRITE_TRANSITIONS)
 {
-	$trackTransitions = $transitionsA
+	$trackSections = $sectionsA
 }
 else
 {
-	$trackTransitions = New-Object Collections.ArrayList
-	foreach ($c in $transitionsB)
+	$trackSections = New-Object Collections.ArrayList
+	foreach ($sec in $sectionsB)
 	{
-		if ($c -match "^(\w):(\d+)-(\d+)(.*)")
+		if ($sec -match "^(\w):(\d+)-(\d+)(.*)")
 		{
-			$trackTransitions.Add( $Matches[1] + ":" + ([int]([int]$Matches[2] * $speedChange)).toString() + "-" + ([int]([int]$Matches[3] * $speedChange)).toString() + $Matches[4] ) | Out-Null
+			$trackSections.Add( $Matches[1] + ":" + ([int]([int]$Matches[2] * $speedChange)).toString() + "-" + ([int]([int]$Matches[3] * $speedChange)).toString() + $Matches[4] ) | Out-Null
 		}
 		else
 		{
-			$trackTransitions.Add($c) | Out-Null
+			$trackSections.Add($sec) | Out-Null
 		}
 	}
 }
 
 $trackObstacles = New-Object Collections.ArrayList
-foreach ($c in $obstaclesB)
+foreach ($i in 0..($obstaclesB.Count - 1))
 {
-	if ($c -match "^(\d+)\:([SZ])-?(\d*)$")
+	$obst = $obstaclesB[$i]
+	
+	if ($obst -match "^(\d+)\:([SZ])-?(\d*)$")
 	{
+		$time = [int]$Matches[1] * $speedChange
+		$type = $Matches[2]
+		
 		$hold = ""
 		if ($Matches[3] -ne "")
 		{
 			$holdTime = [int]$Matches[3] * $speedChange
+			
+			if ($obstaclesB[$i + 1] -match "^(\d+)\:")
+			{
+				$nextTime = [int]$Matches[1] * $speedChange
+				if ($time + $holdTime + $MINIMUM_HOLD_GAP -gt $nextTime)
+				{
+					$holdTime = $nextTime - $time - $MINIMUM_HOLD_GAP
+				}
+			}
+			
 			if ($holdTime -gt $MINIMUM_HOLD_DURATION)
 			{
 				$hold = "-" + [int]$holdTime
 			}
 		}
-		$trackObstacles.Add( ([int]([int]$Matches[1] * $speedChange)).toString() + ":" + $Matches[2] + $hold ) | Out-Null
+		$trackObstacles.Add( ([int]$time).toString() + ":" + $type + $hold ) | Out-Null
 	}
 	else
 	{
-		$trackObstacles.Add($c) | Out-Null
+		$trackObstacles.Add($obst) | Out-Null
 	}
 }
 
-$output = $trackVersion, ($trackMetadata -join ";"), ($trackTransitions -join ";"), ($trackObstacles -join ";")
+$output = $trackVersion, ($trackMetadata -join ";"), ($trackSections -join ";"), ($trackObstacles -join ";")
 
 
 
@@ -234,7 +258,7 @@ $output = $trackVersion, ($trackMetadata -join ";"), ($trackTransitions -join ";
 "???: $($metadataA[1])" | Out-Host
 "BPM: $($metadataA[2])" | Out-Host
 "Time Signature (4/4 or 3/4): $($metadataA[3])" | Out-Host
-"Transition Count: $($transitionsA.Count - 1)" | Out-Host
+"Track Section Count: $($sectionsA.Count - 1)" | Out-Host
 "Raw Obstacle Count: $($obstaclesA.Count - 1)" | Out-Host
 "" | Out-Host
 "* Alternative track '$($fileB.Name)'" | Out-Host
@@ -243,7 +267,7 @@ $output = $trackVersion, ($trackMetadata -join ";"), ($trackTransitions -join ";
 "???: $($metadataB[1])" | Out-Host
 "BPM: $($metadataB[2])" | Out-Host
 "Time Signature (4/4 or 3/4): $($metadataB[3])" | Out-Host
-"Transition Count: $($transitionsB.Count - 1)" | Out-Host
+"Track Section Count: $($sectionsB.Count - 1)" | Out-Host
 "Raw Obstacle Count: $($obstaclesB.Count - 1)" | Out-Host
 "" | Out-Host
 "(Time Adjustment: $($speedChange.ToString("p")))" | Out-Host
@@ -254,7 +278,7 @@ $output = $trackVersion, ($trackMetadata -join ";"), ($trackTransitions -join ";
 "???: $($trackMetadata[1])" | Out-Host
 "BPM: $($trackMetadata[2])" | Out-Host
 "Time Signature (4/4 or 3/4): $($trackMetadata[3])" | Out-Host
-"Transition Count: $($trackTransitions.Count - 1)" | Out-Host
+"Track Section Count: $($trackSections.Count - 1)" | Out-Host
 "Raw Obstacle Count: $($trackObstacles.Count - 1)" | Out-Host
 "" | Out-Host
 
