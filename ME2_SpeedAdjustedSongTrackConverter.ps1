@@ -180,15 +180,7 @@ $obstaclesA = $rawContentA[3] -split ";"
 $obstaclesB = $rawContentB[3] -split ";"
 
 
-if ([float]$versionA -ge [float]$versionB)
-{
-	$trackVersion = $versionA
-}
-else
-{
-	$trackVersion = $versionB
-}
-
+$trackVersion = $versionA
 $trackMetadata = $metadataA[0], $metadataA[1], [int]([int]$metadataB[2] / $speedChange), $metadataA[3]
 
 if (-not $OVERWRITE_TRANSITIONS)
@@ -272,6 +264,11 @@ $output = $trackVersion, ($trackMetadata -join ";"), ($trackSections -join ";"),
 "" | Out-Host
 "(Time Adjustment: $($speedChange.ToString("p")))" | Out-Host
 "" | Out-Host
+if ($versionA -ne $versionB)
+{
+	"WARNING: The version numbers between the two files don't match. Make sure that the resulting file is using the latest game version, otherwise it might trigger the game to recalculate the track." | Out-Host
+	"" | Out-Host
+}
 "- New data -" | Out-Host
 "Version: $trackVersion" | Out-Host
 "Duration: $($trackMetadata[0])" | Out-Host
@@ -281,12 +278,6 @@ $output = $trackVersion, ($trackMetadata -join ";"), ($trackSections -join ";"),
 "Track Section Count: $($trackSections.Count - 1)" | Out-Host
 "Raw Obstacle Count: $($trackObstacles.Count - 1)" | Out-Host
 "" | Out-Host
-
-if ($versionA -ne $versionB)
-{
-	"Warning - Versions don't match." | Out-Host
-	"" | Out-Host
-}
 
 if ($PSCmdlet.ParameterSetName -ne "LiteralPath")
 {
