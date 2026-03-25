@@ -181,7 +181,7 @@ $obstaclesB = $rawContentB[3] -split ";"
 
 
 $trackVersion = $versionA
-$trackMetadata = $metadataA[0], $metadataA[1], [int]([int]$metadataB[2] / $speedChange), $metadataA[3]
+$trackMetadata = $metadataA[0], $metadataA[1], [int]([int]$metadataB[2] / $speedChange), $metadataA[3], $metadataA[4]
 
 if (-not $OVERWRITE_TRANSITIONS)
 {
@@ -246,19 +246,21 @@ $output = $trackVersion, ($trackMetadata -join ";"), ($trackSections -join ";"),
 
 "* Original track '$($fileA.Name)'" | Out-Host
 "Version: $versionA" | Out-Host
-"Duration: $($metadataA[0])" | Out-Host
-"???: $($metadataA[1])" | Out-Host
+"Duration (samples): $($metadataA[0])" | Out-Host
+"Duration (seconds): $($metadataA[1])" | Out-Host
 "BPM: $($metadataA[2])" | Out-Host
 "Time Signature (4/4 or 3/4): $($metadataA[3])" | Out-Host
+"LUFS: $($metadataA[4])" | Out-Host
 "Track Section Count: $($sectionsA.Count - 1)" | Out-Host
 "Raw Obstacle Count: $($obstaclesA.Count - 1)" | Out-Host
 "" | Out-Host
 "* Alternative track '$($fileB.Name)'" | Out-Host
 "Version: $versionB" | Out-Host
-"Duration: $($metadataB[0])" | Out-Host
-"???: $($metadataB[1])" | Out-Host
+"Duration (samples): $($metadataB[0])" | Out-Host
+"Duration (seconds): $($metadataB[1])" | Out-Host
 "BPM: $($metadataB[2])" | Out-Host
 "Time Signature (4/4 or 3/4): $($metadataB[3])" | Out-Host
+"LUFS: $($metadataB[4])" | Out-Host
 "Track Section Count: $($sectionsB.Count - 1)" | Out-Host
 "Raw Obstacle Count: $($obstaclesB.Count - 1)" | Out-Host
 "" | Out-Host
@@ -271,10 +273,11 @@ if ($versionA -ne $versionB)
 }
 "- New data -" | Out-Host
 "Version: $trackVersion" | Out-Host
-"Duration: $($trackMetadata[0])" | Out-Host
-"???: $($trackMetadata[1])" | Out-Host
+"Duration (samples): $($trackMetadata[0])" | Out-Host
+"Duration (seconds): $($trackMetadata[1])" | Out-Host
 "BPM: $($trackMetadata[2])" | Out-Host
 "Time Signature (4/4 or 3/4): $($trackMetadata[3])" | Out-Host
+"LUFS: $($trackMetadata[4])" | Out-Host
 "Track Section Count: $($trackSections.Count - 1)" | Out-Host
 "Raw Obstacle Count: $($trackObstacles.Count - 1)" | Out-Host
 "" | Out-Host
